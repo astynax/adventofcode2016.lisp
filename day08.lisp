@@ -1,22 +1,23 @@
 (load "parser.lisp")
 
 (defparameter p/rect
-  (p/map
-   (lambda (pair) (cons 'rect pair))
-   (p/progn
-    (p/string "rect ")
-    (p/sep-by-1 (p/string "x") p/num))))
+  (p/do
+   (p/pure 'rect)
+   (p/skip (p/string "rect "))
+   p/num
+   (p/skip (p/string "x"))
+   p/num))
 
 (defparameter p/rotate
-  (p/progn
-   (p/string "rotate ")
-   (p/map2
-    #'cons
-    (p/or (p/progn (p/string "column x=")
-                   (p/pure 'rotate-column))
-          (p/progn (p/string "row y=")
-                   (p/pure 'rotate-row)))
-    (p/sep-by-1 (p/string " by ") p/num))))
+  (p/do
+   (p/skip (p/string "rotate "))
+   (p/or (p/progn (p/string "column x=")
+                  (p/pure 'rotate-column))
+         (p/progn (p/string "row y=")
+                  (p/pure 'rotate-row)))
+   p/num
+   (p/skip (p/string " by "))
+   p/num))
 
 (defun input ()
   (loop for line in (uiop:read-file-lines "day08.input")
